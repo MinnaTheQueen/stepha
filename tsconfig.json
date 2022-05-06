@@ -23,8 +23,9 @@
       "@/*": ["./*"],
       "@/root/*": ["./src/*"],
       "@/public/*": ["./public/*"],
-      "@/components/*": ["./src/pages/*"],
+      "@/utils/*": ["./src/utils/*"],
       "@/pages/*": ["./src/pages/*"],
+      "@/components/*": ["./src/components/*"],
     }
   },
   "include": [

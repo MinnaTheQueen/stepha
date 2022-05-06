@@ -1,5 +1,6 @@
 import type { AppProps } from 'next/app';
 
+import { SessionProvider } from 'next-auth/react';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import { createContext, useMemo, useState, useEffect } from 'react';
@@ -51,7 +52,10 @@ declare module '@mui/material/styles' {
 	}
 } */
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+export default function MyApp({
+	Component,
+	pageProps: { session, ...pageProps },
+}: AppProps) {
 	let autoMode;
 	let prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
@@ -135,11 +139,13 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 	);
 
 	return (
-		<ColorModeContext.Provider value={colorMode}>
-			<CssBaseline />
-			<ThemeProvider theme={theme}>
-				<Component {...pageProps} cmc={ColorModeContext} />
-			</ThemeProvider>
-		</ColorModeContext.Provider>
+		<SessionProvider session={session}>
+			<ColorModeContext.Provider value={colorMode}>
+				<CssBaseline />
+				<ThemeProvider theme={theme}>
+					<Component {...pageProps} cmc={ColorModeContext} />
+				</ThemeProvider>
+			</ColorModeContext.Provider>
+		</SessionProvider>
 	);
 }

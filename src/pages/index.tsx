@@ -14,8 +14,10 @@ import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import PlusIcon from '@mui/icons-material/AddRounded';
 
 import { useContext, createContext, useState } from 'react';
+import { useSession, signIn, signOut } from 'next-auth/react';
 import { useTheme } from '@mui/material/styles';
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
@@ -26,10 +28,28 @@ export interface Props {
 
 let appName = 'stepha.xyz';
 
-const pages = [{ name: 'Sobre Mim' }, { name: 'Doações' }, { name: 'Blog' }];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const pages = [
+	{ name: 'Sobre mim' },
+	{ name: 'Doações' },
+	{ name: 'Blog' },
+	//{ url: '/api/invite', name: 'Me adicione' },
+];
 
 const HomePage: React.FC<Props> = ({ cmc }) => {
+	const { data: session } = useSession();
+
+	const settings = [
+		{ name: 'Profile' },
+		{ name: 'Account' },
+		{ name: 'Dashboard' },
+		{
+			name: 'Logout',
+			onClick: () => {
+				window.location.href = '/api/auth/signout';
+			},
+		},
+	];
+
 	const theme = useTheme();
 	const colorMode = useContext(cmc);
 
@@ -69,7 +89,11 @@ const HomePage: React.FC<Props> = ({ cmc }) => {
 				<meta name="viewport" content="initial-scale=1, width=device-width" />
 
 				<link rel="preconnect" href="https://fonts.googleapis.com" />
-				<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+				<link
+					rel="preconnect"
+					href="https://fonts.gstatic.com"
+					crossOrigin="anonymous"
+				/>
 				<link
 					href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
 					rel="stylesheet"
@@ -122,8 +146,16 @@ const HomePage: React.FC<Props> = ({ cmc }) => {
 									}}
 								>
 									{pages.map((page) => (
-										<MenuItem key={page.name} onClick={handleCloseNavMenu}>
-											<Typography textAlign="center">{page.name}</Typography>
+										<MenuItem
+											key={page['name']}
+											onClick={() => {
+												if (typeof page['url'] === 'string')
+													window.location.href = page['url'];
+
+												handleCloseNavMenu();
+											}}
+										>
+											<Typography textAlign="center">{page['name']}</Typography>
 										</MenuItem>
 									))}
 								</Menu>
@@ -143,15 +175,20 @@ const HomePage: React.FC<Props> = ({ cmc }) => {
 							<Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
 								{pages.map((page) => (
 									<Button
-										key={page.name}
-										onClick={handleCloseNavMenu}
+										key={page['name']}
+										onClick={() => {
+											if (typeof page['url'] === 'string')
+												window.location.href = page['url'];
+
+											handleCloseNavMenu();
+										}}
 										sx={{
 											my: 2,
 											color: `${theme.palette.text.secondary}`,
 											display: 'block',
 										}}
 									>
-										{page.name}
+										{page['name']}
 									</Button>
 								))}
 							</Box>
@@ -168,14 +205,35 @@ const HomePage: React.FC<Props> = ({ cmc }) => {
 										<Brightness4Icon />
 									)}
 								</IconButton>
-								<Tooltip title="Open settings">
-									<IconButton
-										onClick={handleOpenUserMenu}
-										sx={{ display: 'none', p: 0 }}
-									>
-										<Avatar alt="MinnaTheQueen" src={null} />
-									</IconButton>
-								</Tooltip>
+								{session ? (
+									<Tooltip title="Abrir configurações">
+										<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+											<Avatar
+												alt={`${session.user['name']}${session.user['discriminator']}`}
+												src={session.user['image']}
+											/>
+										</IconButton>
+									</Tooltip>
+								) : (
+									<Tooltip title="Me adicione">
+										<IconButton
+											key={'invite'}
+											onClick={() => {
+												window.location.href = '/api/auth/signin/discord';
+											}}
+											size="large"
+											sx={{ ml: 1 }}
+											/* sx={{
+												my: 2,
+												color: `${theme.palette.text.secondary}`,
+												display: 'block',
+											}} */
+											color="inherit"
+										>
+											<PlusIcon />
+										</IconButton>
+									</Tooltip>
+								)}
 								<Menu
 									sx={{ mt: '45px' }}
 									id="menu-appbar"
@@ -193,8 +251,17 @@ const HomePage: React.FC<Props> = ({ cmc }) => {
 									onClose={handleCloseUserMenu}
 								>
 									{settings.map((setting) => (
-										<MenuItem key={setting} onClick={handleCloseUserMenu}>
-											<Typography textAlign="center">{setting}</Typography>
+										<MenuItem
+											key={setting.name}
+											onClick={() => {
+												if (setting['onClick'] instanceof Function) {
+													setting['onClick']();
+												}
+
+												handleCloseUserMenu();
+											}}
+										>
+											<Typography textAlign="center">{setting.name}</Typography>
 										</MenuItem>
 									))}
 								</Menu>
