@@ -55,15 +55,18 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 	let autoMode;
 	let prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
+	const [mode, setMode] = useState<'light' | 'dark'>(autoMode || 'dark');
+
 	useEffect(() => {
 		if (window) {
 			autoMode = window.localStorage.getItem('colorMode');
 
 			if (!autoMode) autoMode = prefersDarkMode ? 'dark' : 'light';
+
+			setMode(autoMode || 'dark');
 		}
 	}, []);
 
-	const [mode, setMode] = useState<'light' | 'dark'>(autoMode || 'dark');
 	const colorMode = useMemo(
 		() => ({
 			toggleColorMode: () => {
