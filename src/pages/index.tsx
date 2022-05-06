@@ -51,8 +51,6 @@ const HomePage: React.FC<Props> = ({ cmc }) => {
 		setAnchorElUser(null);
 	};
 
-	console.log(theme.palette);
-
 	return (
 		<div
 			style={{
