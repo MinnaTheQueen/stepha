@@ -1,0 +1,4 @@
+This is a Brave Rewards publisher verification file.
+
+Domain: stepha.xyz
+Token: f16b1ff9c53112c7339352a2c22289ed7fe640a830869e22b2df882c0b5c2bb0
